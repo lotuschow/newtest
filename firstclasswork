@@ -1,0 +1,42 @@
+// 导入必要的库和模块
+use frame_support::{assert_ok, assert_noop};
+use super::*;
+
+#[test]
+fn create_proof() {
+    new_test_ext().execute_with(|| {
+        // 创建存证的测试用例
+        assert_ok!(ProofOfExistenceModule::create_proof(Origin::signed(1), b"Hello".to_vec()));
+        
+        // 检查存证是否存在
+        assert_eq!(Proofs::<Test>::contains_key(b"Hello"), true);
+    });
+}
+
+#[test]
+fn revoke_proof() {
+    new_test_ext().execute_with(|| {
+        // 创建存证
+        assert_ok!(ProofOfExistenceModule::create_proof(Origin::signed(1), b"Hello".to_vec()));
+
+        // 撤销存证的测试用例
+        assert_ok!(ProofOfExistenceModule::revoke_proof(Origin::signed(1), b"Hello".to_vec()));
+
+        // 检查存证是否撤销成功
+        assert_eq!(Proofs::<Test>::contains_key(b"Hello"), false);
+    });
+}
+
+#[test]
+fn transfer_proof() {
+    new_test_ext().execute_with(|| {
+        // 创建存证
+        assert_ok!(ProofOfExistenceModule::create_proof(Origin::signed(1), b"Hello".to_vec()));
+
+        // 转移存证的测试用例
+        assert_ok!(ProofOfExistenceModule::transfer_proof(Origin::signed(1), b"Hello".to_vec(), 2));
+
+        // 检查存证是否成功转移
+        assert_eq!(Proofs::<Test>::get(b"Hello").owner, 2);
+    });
+}
